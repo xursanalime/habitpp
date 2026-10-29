@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'home_screen.dart';
 import 'store.dart';
+import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,12 +21,7 @@ class HabitppApp extends StatelessWidget {
     return MaterialApp(
       title: 'Habitpp',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.redAccent,
-          brightness: Brightness.dark,
-        ),
-      ),
+      theme: buildTheme(),
       home: HomeScreen(state: state, clock: clock),
     );
   }

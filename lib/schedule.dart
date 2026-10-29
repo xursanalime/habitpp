@@ -78,16 +78,7 @@ const vocabReview = TaskDef(
   unit: "so'z",
 );
 
-const allTasks = [
-  reading,
-  listening,
-  mock,
-  writing,
-  youtube,
-  speaking,
-  vocabNew,
-  vocabReview,
-];
+const allTasks = [reading, listening, mock, writing, youtube, speaking, vocabNew, vocabReview];
 
 /// Reading Mon/Wed/Fri, Listening Tue/Thu/Sat, a mock on Sunday; the rest daily.
 List<TaskDef> tasksFor(DateTime day) {

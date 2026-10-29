@@ -6,17 +6,22 @@ import 'package:path_provider/path_provider.dart';
 
 import 'models.dart';
 
-/// Holds all log entries and saves them to a JSON file after every change.
+/// Holds log entries and settings, saving each to its JSON file after every change.
 class AppState extends ChangeNotifier {
-  AppState({this.file, List<LogEntry>? logs}) : logs = logs ?? [];
+  AppState({this.file, this.settingsFile, List<LogEntry>? logs, Settings? settings})
+    : logs = logs ?? [],
+      settings = settings ?? Settings();
 
   /// Where data is saved; null keeps it in memory only (tests).
   final File? file;
+  final File? settingsFile;
   final List<LogEntry> logs;
+  final Settings settings;
 
   static Future<AppState> load() async {
     final dir = await getApplicationSupportDirectory();
     final file = File('${dir.path}/habitpp_data.json');
+    final settingsFile = File('${dir.path}/habitpp_settings.json');
     final logs = <LogEntry>[];
     if (await file.exists()) {
       final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
@@ -24,25 +29,31 @@ class AppState extends ChangeNotifier {
         logs.add(LogEntry.fromJson(e as Map<String, dynamic>));
       }
     }
-    return AppState(file: file, logs: logs);
+    var settings = Settings();
+    if (await settingsFile.exists()) {
+      settings = Settings.fromJson(jsonDecode(await settingsFile.readAsString()) as Map<String, dynamic>);
+    }
+    return AppState(file: file, settingsFile: settingsFile, logs: logs, settings: settings);
   }
 
   Future<void> add(LogEntry entry) async {
     logs.add(entry);
     notifyListeners();
-    await _save();
+    await _write(file, {'version': 1, 'logs': logs.map((e) => e.toJson()).toList()});
   }
 
-  Future<void> _save() async {
-    final file = this.file;
+  Future<void> updateSettings(void Function(Settings s) change) async {
+    change(settings);
+    notifyListeners();
+    await _write(settingsFile, settings.toJson());
+  }
+
+  static Future<void> _write(File? file, Map<String, dynamic> json) async {
     if (file == null) return;
     await file.parent.create(recursive: true);
     // Write to a temp file first so a crash mid-write can't corrupt the data.
     final tmp = File('${file.path}.tmp');
-    await tmp.writeAsString(jsonEncode({
-      'version': 1,
-      'logs': logs.map((e) => e.toJson()).toList(),
-    }));
+    await tmp.writeAsString(jsonEncode(json));
     await tmp.rename(file.path);
   }
 }

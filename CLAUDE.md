@@ -9,8 +9,15 @@ Faqat bitta foydalanuvchi (Xursanali) uchun shaxsiy ilova: imtihongacha (2026-12
 ## Kod tuzilishi
 - `lib/schedule.dart`: vazifalar, minimal/to'liq dozalar, hafta jadvali, imtihon va boshlanish sanasi
 - `lib/logic.dart`: qarz, 2 kun qoidasi (alarm), streak. Qarzni keyin to'lasa qarz o'chadi, lekin o'sha kun "o'z vaqtida bajarilmagan" bo'lib qoladi
-- `lib/store.dart`: AppState, saqlash
-- `lib/home_screen.dart`, `lib/proof_dialog.dart`: UI
+- `lib/store.dart`: AppState, saqlash (loglar + sozlamalar, Telegram token faqat lokal faylda)
+- `lib/desktop.dart`: notify-send eslatma, autostart, Telegram yuborish
+- `lib/home_screen.dart`: shell (keng ekranda sidebar, torda pastki menyu), 20:45 eslatma va 20:59 hisobot taymeri
+- `lib/today_page.dart`, `lib/stats_page.dart`, `lib/settings_page.dart`, `lib/proof_dialog.dart`: sahifalar
+- `lib/theme.dart`, `lib/widgets.dart`: dizayn tokenlari, Panel, ring, grafiklar (tashqi kutubxonasiz)
+- `test/layout_test.dart`: har sahifani 1360/900/400 px kenglikda overflowsiz chizilishini tekshiradi
+
+## Ubuntu'ga o'rnatish
+`./scripts/install_linux.sh` — build qiladi va `~/.local/share/habitpp` ga o'rnatadi (sudo kerak emas), menyuga qo'shadi
 - Sinxron: Cloudflare Workers + D1 (2-bosqich)
 - Login yo'q, maxfiy kalit bilan
 

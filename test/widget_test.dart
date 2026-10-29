@@ -8,15 +8,15 @@ import 'package:habitpp/store.dart';
 
 /// Entries that bring every task of [day] exactly to its minimum.
 List<LogEntry> minimumDay(DateTime day, {DateTime? loggedAt}) => [
-      for (final t in tasksFor(day))
-        LogEntry(
-          date: dayKey(day),
-          taskId: t.id,
-          value: t.metric == MetricKind.score ? 1 : t.minimum,
-          total: t.metric == MetricKind.score ? t.minimum : null,
-          loggedAt: loggedAt ?? day.add(const Duration(hours: 20)),
-        ),
-    ];
+  for (final t in tasksFor(day))
+    LogEntry(
+      date: dayKey(day),
+      taskId: t.id,
+      value: t.metric == MetricKind.score ? 1 : t.minimum,
+      total: t.metric == MetricKind.score ? t.minimum : null,
+      loggedAt: loggedAt ?? day.add(const Duration(hours: 20)),
+    ),
+];
 
 void main() {
   final fri = DateTime(2026, 10, 30); // trackingStart
@@ -37,9 +37,7 @@ void main() {
   });
 
   test('score tasks count questions attempted, not correct answers', () {
-    final entries = [
-      LogEntry(date: '2026-11-02', taskId: 'reading', value: 5, total: 13, loggedAt: fri),
-    ];
+    final entries = [LogEntry(date: '2026-11-02', taskId: 'reading', value: 5, total: 13, loggedAt: fri)];
     expect(levelOf(reading, progressOf(reading, entries)), Level.minimum);
   });
 
@@ -69,18 +67,33 @@ void main() {
     expect(Tracker(minimumDay(sat)).streak(sun), 1);
   });
 
+  test('week summary and audit verdict', () {
+    final mon = DateTime(2026, 11, 2);
+    final logs = [...minimumDay(mon), ...minimumDay(addDays(mon, 1))];
+    final week = Tracker(logs).week(addDays(mon, 3));
+    expect(week.start, mon);
+    expect(week.closedDays, 3);
+    expect(week.onTimeDays, 2);
+    expect(week.verdict, contains('80%'));
+    expect(Tracker([]).week(mon).rate, isNull);
+  });
+
+  test('report lists every task with marks and debt', () {
+    final report = buildReport(Tracker(minimumDay(sat)), sat.add(const Duration(hours: 21)));
+    expect(report, contains('✅ Bugun: 6/6'));
+    expect(report, contains('Listening'));
+    expect(report, contains('🔴 Qarz: 6 ta'));
+  });
+
   testWidgets('home shows debt and red alarm, and logs a task', (tester) async {
     tester.view.physicalSize = const Size(900, 4000);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
     final state = AppState();
-    await tester.pumpWidget(HabitppApp(
-      state: state,
-      clock: () => DateTime(2026, 11, 1, 10),
-    ));
+    await tester.pumpWidget(HabitppApp(state: state, clock: () => DateTime(2026, 11, 1, 10)));
 
-    expect(find.text('QARZ: 12 ta'), findsOneWidget);
+    expect(find.text('12 ta qarz'), findsOneWidget);
     expect(find.textContaining("2 KUN KETMA-KET"), findsOneWidget);
 
     await tester.tap(find.text('Writing').first);
@@ -92,6 +105,6 @@ void main() {
 
     expect(state.logs, hasLength(1));
     expect(state.logs.single.date, '2026-11-01');
-    expect(find.textContaining('Bugun · Yakshanba · 1/6'), findsOneWidget);
+    expect(find.text('1/6'), findsOneWidget);
   });
 }
