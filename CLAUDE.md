@@ -4,7 +4,13 @@ Faqat bitta foydalanuvchi (Xursanali) uchun shaxsiy ilova: imtihongacha (2026-12
 
 ## Stack
 - Flutter: Ubuntu (linux) va Android, bitta kod bazasi
-- Lokal: SQLite (offline-first)
+- Lokal: JSON fayl (`habitpp_data.json`, path_provider'ning application support papkasida), offline-first. Ma'lumot kam, SQLite shart emas
+
+## Kod tuzilishi
+- `lib/schedule.dart`: vazifalar, minimal/to'liq dozalar, hafta jadvali, imtihon va boshlanish sanasi
+- `lib/logic.dart`: qarz, 2 kun qoidasi (alarm), streak. Qarzni keyin to'lasa qarz o'chadi, lekin o'sha kun "o'z vaqtida bajarilmagan" bo'lib qoladi
+- `lib/store.dart`: AppState, saqlash
+- `lib/home_screen.dart`, `lib/proof_dialog.dart`: UI
 - Sinxron: Cloudflare Workers + D1 (2-bosqich)
 - Login yo'q, maxfiy kalit bilan
 
